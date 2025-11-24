@@ -20,7 +20,7 @@ const PUBLIC_AUTH_ROUTES = [
   // Add any other auth routes here
 ];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Check if the requested route is protected
