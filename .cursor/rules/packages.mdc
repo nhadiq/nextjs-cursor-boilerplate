@@ -1,0 +1,7 @@
+---
+description: Package management
+globs: 
+alwaysApply: false
+---
+Never downgrade packages, always keep them uptodate using pnpm and work around code to fix issues and make them the latest.
+Also ensure only popular packages are used and no deprecated packages or subdependencies should be introduced while adding new packages

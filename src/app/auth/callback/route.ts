@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from '@/lib/supabase';
+import { createSupabaseServerClient } from '@/lib/supabase-server';
 import { NextResponse } from 'next/server';
 import { type NextRequest } from 'next/server';
 
@@ -6,7 +6,7 @@ import { type NextRequest } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     // Create a Supabase client
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
 
     // Get the code from the URL
     const requestUrl = new URL(request.url);

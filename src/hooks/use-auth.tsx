@@ -87,6 +87,13 @@ export function AuthProvider({
     const handleAuthStateChange = async () => {
       try {
         if (provider === 'firebase') {
+          // Check if Firebase is configured before setting up listener
+          if (!FirebaseAuth.isFirebaseConfigured()) {
+            console.warn('Firebase is not configured. Skipping Firebase auth initialization.');
+            setLoading(false);
+            return () => {};
+          }
+          
           // Set up Firebase auth listener
           const unsubscribe = FirebaseAuth.onAuthStateChange((user) => {
             setUser(normalizeUserData(user, 'firebase'));
@@ -95,6 +102,13 @@ export function AuthProvider({
           
           return () => unsubscribe();
         } else {
+          // Check if Supabase is configured before setting up listener
+          if (!SupabaseAuth.isSupabaseConfigured()) {
+            console.warn('Supabase is not configured. Skipping Supabase auth initialization.');
+            setLoading(false);
+            return () => {};
+          }
+          
           // Set up Supabase auth listener
           const { data } = SupabaseAuth.supabase.auth.onAuthStateChange(
             async (_event, session) => {

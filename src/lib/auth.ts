@@ -91,7 +91,7 @@ export class AuthService {
    */
   getAuthInstance() {
     return this.provider === 'firebase'
-      ? FirebaseAuth.auth
+      ? FirebaseAuth.getFirebaseAuth()
       : SupabaseAuth.supabase.auth;
   }
 }
