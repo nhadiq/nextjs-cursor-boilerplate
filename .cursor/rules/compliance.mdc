@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Enforce accessibility best practices in Next.js components
+globs: ["**/*.tsx", "**/*.ts"]
+alwaysApply: false
+---
+
+## Accessibility Guidelines
+
+- Use semantic HTML elements (e.g., `<button>`, `<nav>`, `<main>`, `<section>`) to convey meaning and structure.
+- Ensure all interactive elements are keyboard accessible.
+- Provide descriptive `alt` text for all images; use empty `alt` attributes for decorative images.
+- Utilize ARIA attributes appropriately to enhance accessibility without redundancy.
+- Implement proper labeling for form elements using `<label>` tags and `htmlFor` attributes.
+- Ensure sufficient color contrast between text and background.
+- Use `eslint-plugin-jsx-a11y` to catch common accessibility issues during development.
+- Validate accessibility using tools like axe-core or Lighthouse.

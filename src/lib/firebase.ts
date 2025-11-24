@@ -22,25 +22,59 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Check if Firebase is configured
+const isFirebaseConfigured = () => {
+  return Boolean(
+    firebaseConfig.apiKey &&
+    firebaseConfig.authDomain &&
+    firebaseConfig.projectId &&
+    firebaseConfig.appId
+  );
+};
+
 // Initialize Firebase if not already initialized
-let app: FirebaseApp;
+let app: FirebaseApp | null = null;
+let auth: ReturnType<typeof getAuth> | null = null;
+let googleProvider: GoogleAuthProvider | null = null;
 
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApps()[0];
-}
+const initializeFirebase = () => {
+  if (!isFirebaseConfigured()) {
+    throw new Error('Firebase is not configured. Please add Firebase environment variables.');
+  }
 
-// Get auth instance
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApps()[0];
+  }
+
+  auth = getAuth(app);
+  googleProvider = new GoogleAuthProvider();
+};
+
+// Get auth instance (lazy initialization)
+const getAuthInstance = () => {
+  if (!auth) {
+    initializeFirebase();
+  }
+  return auth!;
+};
+
+// Get Google provider instance (lazy initialization)
+const getGoogleProvider = () => {
+  if (!googleProvider) {
+    initializeFirebase();
+  }
+  return googleProvider!;
+};
 
 // Sign up with email and password
 export const signUpWithEmailAndPassword = async (
   email: string,
   password: string
 ): Promise<UserCredential> => {
-  return createUserWithEmailAndPassword(auth, email, password);
+  const authInstance = getAuthInstance();
+  return createUserWithEmailAndPassword(authInstance, email, password);
 };
 
 // Sign in with email and password
@@ -48,32 +82,43 @@ export const signInWithEmailAndPassword = async (
   email: string,
   password: string
 ): Promise<UserCredential> => {
-  return firebaseSignInWithEmailAndPassword(auth, email, password);
+  const authInstance = getAuthInstance();
+  return firebaseSignInWithEmailAndPassword(authInstance, email, password);
 };
 
 // Sign in with Google
 export const signInWithGoogle = async (): Promise<UserCredential> => {
-  return signInWithPopup(auth, googleProvider);
+  const authInstance = getAuthInstance();
+  const provider = getGoogleProvider();
+  return signInWithPopup(authInstance, provider);
 };
 
 // Sign out
 export const signOutUser = async (): Promise<void> => {
-  return signOut(auth);
+  const authInstance = getAuthInstance();
+  return signOut(authInstance);
 };
 
 // Reset password
 export const resetPassword = async (email: string): Promise<void> => {
-  return sendPasswordResetEmail(auth, email);
+  const authInstance = getAuthInstance();
+  return sendPasswordResetEmail(authInstance, email);
 };
 
 // Current user
 export const getCurrentUser = (): User | null => {
-  return auth.currentUser;
+  const authInstance = getAuthInstance();
+  return authInstance.currentUser;
 };
 
 // Auth state change listener
 export const onAuthStateChange = (callback: (user: User | null) => void): (() => void) => {
-  return onAuthStateChanged(auth, callback);
+  const authInstance = getAuthInstance();
+  return onAuthStateChanged(authInstance, callback);
 };
 
-export { auth }; 
+// Export auth getter for compatibility
+export const getFirebaseAuth = () => getAuthInstance();
+
+// Export configuration check
+export { isFirebaseConfigured }; 

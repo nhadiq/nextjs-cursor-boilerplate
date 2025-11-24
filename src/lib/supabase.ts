@@ -1,13 +1,37 @@
-import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Supabase URL and anon key from environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Check if Supabase is configured
+export const isSupabaseConfigured = () => {
+  return Boolean(supabaseUrl && supabaseAnonKey);
+};
+
+// Lazy initialization of Supabase client
+let supabaseInstance: SupabaseClient | null = null;
+
+const getSupabaseClient = () => {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase is not configured. Please add Supabase environment variables.');
+  }
+  
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  
+  return supabaseInstance;
+};
+
+// Export supabase client getter
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getSupabaseClient();
+    const value = client[prop as keyof SupabaseClient];
+    return typeof value === 'function' ? value.bind(client) : value;
+  }
+});
 
 // Sign up with email and password
 export const signUpWithEmailAndPassword = async (email: string, password: string) => {
@@ -88,36 +112,3 @@ export const getSession = async () => {
   const { data: { session } } = await supabase.auth.getSession();
   return session;
 };
-
-// Create server client for server components
-export const createSupabaseServerClient = () => {
-  const cookieStore = cookies();
-  
-  return createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: { path?: string; maxAge?: number; domain?: string; secure?: boolean; httpOnly?: boolean; }) {
-          try {
-            cookieStore.set(name, value, options);
-          } catch (error) {
-            // Handle cookie set error
-            console.error('Error setting cookie:', error);
-          }
-        },
-        remove(name: string, options: { path?: string; maxAge?: number; domain?: string; secure?: boolean; httpOnly?: boolean; }) {
-          try {
-            cookieStore.set(name, '', { ...options, maxAge: 0 });
-          } catch (error) {
-            // Handle cookie remove error
-            console.error('Error removing cookie:', error);
-          }
-        },
-      },
-    }
-  );
-}; 
