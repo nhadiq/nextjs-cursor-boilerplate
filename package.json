@@ -45,7 +45,7 @@
     "embla-carousel-react": "^8.6.0",
     "firebase": "^12.9.0",
     "input-otp": "^1.4.2",
-    "lucide-react": "^0.563.0",
+    "lucide-react": "^0.564.0",
     "next": "16.1.6",
     "next-devtools-mcp": "^0.3.10",
     "next-firebase-auth": "^1.4.0",
