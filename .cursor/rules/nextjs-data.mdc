@@ -39,8 +39,8 @@ export const updateProfileAction = actionClient
 
 ## Client integration
 
-- Use `useAction` from `next-safe-action/hooks` for form submissions (see `profile-form.tsx`)
-- TanStack Query: `QueryClientProvider` in `providers.tsx`; use `useQuery` when client caching is needed
+- Use `useAction` from `next-safe-action/hooks` for form submissions (see `src/components/profile/profile-form.tsx`)
+- TanStack Query: `QueryClientProvider` in `src/app/providers.tsx`; use `useQuery` when client caching is needed
 - `ActionResponse<T>` type in `src/types/actions.ts` for non-safe-action returns
 
 ## Validation & error handling

@@ -1,5 +1,5 @@
 ---
-description: Fix linting
+description: ESLint — fix violations in source; never disable rules or edit config to bypass
 globs: **/*.ts, **/*.tsx, **/*.js, **/*.jsx, eslint.config.*
 alwaysApply: false
 ---

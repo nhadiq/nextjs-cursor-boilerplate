@@ -27,7 +27,7 @@ globs: src/**/*, prisma/**
 - Never commit .env, tokens, keys, or credentials
 - All secrets via environment variables; validate at startup with src/env.ts (Zod)
 - Never log session tokens, passwords, reset tokens, or API keys
-- Rotate BETTER_AUTH_SECRET on compromise; document in security-policy.md
+- Rotate BETTER_AUTH_SECRET on compromise; document in `docs/security-policy.md`
 
 ## HTTP & Browser Security
 - Security headers on all responses (see next.config.ts / vercel.json)
