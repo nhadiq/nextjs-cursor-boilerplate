@@ -38,6 +38,9 @@ if (!existsSync('.env') && existsSync('.env.example')) {
 console.log('Generating Prisma client...');
 run('pnpm', ['exec', 'prisma', 'generate']);
 
+console.log('\nGenerating Next.js TypeScript definitions...');
+run('pnpm', ['exec', 'next', 'typegen'], { optional: true });
+
 console.log('\nApplying database migrations...');
 const migrated = run('pnpm', ['exec', 'prisma', 'migrate', 'deploy'], {
   optional: true,
