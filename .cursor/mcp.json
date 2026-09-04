@@ -2,12 +2,8 @@
   "mcpServers": {
     "Magic MCP": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@21st-dev/magic@latest",
-        "API_KEY=\"f3a7c25fa5a7514dd5949a27c3d0cd30e37e7e71657b1d2087f7b66e69766749\""
-      ],
-      "env": {}
+      "args": ["-y", "@21st-dev/magic@latest"],
+      "env": { "API_KEY": "${MAGIC_API_KEY}" }
     },
     "shadcn": {
       "command": "npx",

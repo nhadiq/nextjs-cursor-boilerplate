@@ -1,0 +1,22 @@
+---
+description: UI components — shadcn, Tailwind, Suspense, dynamic loading, performance
+alwaysApply: false
+globs: src/**/*.tsx
+---
+
+# Next.js UI
+
+## Components & styling
+
+- Use Shadcn UI and Tailwind CSS for components and styling
+- All shadcn components live at `src/components/ui/`
+- Implement responsive, mobile-first design with Tailwind CSS
+- **Colors:** follow `color-theming.mdc` — semantic Tailwind tokens only, no raw hex/hsl/oklch in TSX
+- **Accessibility:** follow `accessibility-wcag.mdc` — WCAG 2.2 AA baseline on all UI
+
+## Performance
+
+- Minimize `'use client'`, `useEffect`, and `setState`; favor React Server Components
+- Wrap client components in `<Suspense>` with a fallback
+- Use `dynamic()` from `next/dynamic` for non-critical client components
+- Optimize images via `next/image` (see `nextjs-core.mdc`)

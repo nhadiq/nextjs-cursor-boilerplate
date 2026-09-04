@@ -1,0 +1,46 @@
+---
+description: Prisma 7 config, adapter patterns, org schema, and query conventions
+alwaysApply: false
+globs: prisma/**, src/lib/db.ts, src/generated/**
+---
+
+# Prisma
+
+## Prisma 7 setup (project-specific)
+
+| Rule | Detail |
+|------|--------|
+| Config | Database URL in `prisma.config.ts` — **not** in `schema.prisma` |
+| Client output | `src/generated/prisma` via `generator output` in schema |
+| Dev adapter | `src/lib/db.ts` uses `@prisma/adapter-better-sqlite3` |
+| Prod swap | See `docs/postgresql.md` — change adapter + `datasource provider` |
+| Singleton | `globalForPrisma` pattern in `db.ts` — do not create multiple `PrismaClient` instances |
+| Env | `DATABASE_URL` validated in `src/env.ts` |
+
+## Schema conventions
+
+- Both sides of every `@relation` with `@relation` attribute
+- `@@map` / `@map` for Better Auth table names (`user`, `session`, `account`, etc.)
+- Org models: `Organization`, `Member`, `Invitation` — all org-scoped queries filter by `organizationId`
+- Session field `activeOrganizationId` on `Session` — set on signup hook and org switch
+- Timestamps: `createdAt` + `updatedAt` where applicable
+- Indexes on foreign keys (`@@index([userId])`, `@@index([organizationId])`)
+
+## Commands
+
+| Task | Command |
+|------|---------|
+| Fresh local DB | `pnpm bootstrap` or `pnpm db:push` |
+| Migrations | `pnpm db:migrate` (fresh clones); existing DB may need baseline — see `.cursor/context.md` |
+| Generate client | `pnpm db:generate` (runs on `postinstall`) |
+
+## Query rules
+
+- Use Prisma ORM — parameterized queries only; no raw SQL string concatenation
+- Org-scoped reads/writes: always include `organizationId` from verified session
+- Use `prisma.member.findFirst({ where: { userId, organizationId } })` for membership checks — prefer `tenant-guard.ts` helpers
+- **NEVER** delete Better Auth core models (`User`, `Session`, `Account`, `Verification`) — extend, don't replace
+
+## Cross-reference
+
+> For IDOR prevention and RBAC, see `better-auth-multitenancy.mdc` and `security.mdc`.

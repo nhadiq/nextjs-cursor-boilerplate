@@ -1,0 +1,45 @@
+---
+description: Better Auth + org multitenancy file map and anti-hallucination rules
+alwaysApply: false
+globs: src/proxy.ts, src/lib/auth*.ts, src/lib/auth-guard.ts, src/lib/tenant-guard.ts, src/lib/org-server.ts, src/lib/org-permissions.ts, src/lib/email.ts, src/app/**/auth/**, src/app/api/auth/**, src/hooks/use-auth.tsx, src/hooks/use-organization.tsx
+---
+
+# Better Auth & Multitenancy
+
+Anti-hallucination file map. Every rule references an actual path in this repo.
+
+## File map (source of truth)
+
+| Concern | File | Export / API |
+|---------|------|--------------|
+| Auth config | `src/lib/auth.ts` | `auth` — Better Auth + `organization()` plugin, Resend emails, `databaseHooks.user.create.after` (personal org) |
+| Auth API route | `src/app/api/auth/[...all]/route.ts` | Single catch-all — do not create duplicate auth routes |
+| Server session (org-aware) | `src/lib/org-server.ts` | `getServerSession()`, `requireSession()`, `requireOrganization()`, `getActiveOrganization()` |
+| Server session (simple) | `src/lib/auth-server.ts` | `getServerSession()` only — prefer `org-server.ts` for protected features |
+| Client auth | `src/lib/auth-client.ts` | `authClient` with `organizationClient()` plugin |
+| Optimistic guard | `src/lib/auth-guard.ts` | `runAuthGuard()`, `PROTECTED_ROUTES`, `SENSITIVE_ROUTES`, locale stripping |
+| Proxy (Next.js 16) | `src/proxy.ts` | next-intl + `runAuthGuard()` + rate limit on `/api/auth/*` |
+| Tenant security | `src/lib/tenant-guard.ts` | `assertOrgMember()`, `scopeToActiveOrg()`, `requireOrgPermission()` |
+| RBAC permissions | `src/lib/org-permissions.ts` | `can()`, `isOrgRole()`, `OrgPermission` type |
+| Email | `src/lib/email.ts` | Resend; dev fallback logs to console |
+| Auth hook (client) | `src/hooks/use-auth.tsx` | Client session wrapper |
+
+## Rules
+
+1. **NEVER** use Supabase, Firebase, Auth.js, or custom session JWT — Better Auth only
+2. **NEVER** use deprecated `middleware.ts` — route protection is `src/proxy.ts` + `auth-guard.ts` (Next.js 16+)
+3. **NEVER** use `getSessionCookie()` for authorization — optimistic redirect only; call `auth.api.getSession({ headers })` in RSC/actions
+4. **ALWAYS** use `requireSession()` or `requireOrganization()` in server actions that need auth
+5. **ALWAYS** call `requireOrgPermission()` before member/invitation/settings mutations
+6. **NEVER** trust `organizationId` from client input — scope via `session.session.activeOrganizationId` + `assertOrgMember()`
+7. Auth pages live at `src/app/[locale]/auth/**` — API stays at `/api/auth/*` (no locale prefix)
+8. Redirects must include locale: use `withLocalePrefix()` or `@/i18n/navigation` `redirect({ href, locale })`
+9. `SENSITIVE_ROUTES` (`/settings`, `/org`) require full server-side permission checks — proxy cookie check alone is insufficient
+10. Personal org auto-created on signup via `databaseHooks` — do not duplicate this logic elsewhere
+11. Google OAuth optional — gated by `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` in `src/env.ts`
+12. Email verification required (`requireEmailVerification: true`) — account not fully active until verified
+
+## Cross-reference
+
+> For security policies (cookie flags, CSP, rate limits, secret handling), see `security.mdc`.
+> For Prisma org models and queries, see `prisma.mdc`.

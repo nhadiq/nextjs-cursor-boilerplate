@@ -1,29 +1,32 @@
 ---
 description: WCAG 2.2 AA accessibility baseline for all UI
-alwaysApply: true
-globs: ["**/*.tsx", "**/*.ts"]
+alwaysApply: false
+globs: src/**/*.tsx
 ---
 
 ## WCAG 2.2 AA baseline
 
 Target conformance: WCAG 2.2 Level AA for all new UI.
 
+See also: `docs/accessibility.md`
+
 ## Requirements
+
 - Semantic HTML (`nav`, `main`, `header`, `section`)
 - All images have `alt`; decorative icons use `aria-hidden`
-- Skip-to-content link as first focusable element (`SkipLink`)
-- `<html lang={locale} dir={dir}>` from locale config
-- Every input has `<Label htmlFor>`; errors use `aria-invalid` + `aria-describedby`
-- Focus visible: `focus-visible:ring-ring` with min 3px ring
+- Skip-to-content link as first focusable element — use `SkipLink` from `src/components/layout/skip-link.tsx` in `src/app/[locale]/layout.tsx`; target `<main id="main-content">`
+- `<html lang={locale} dir={dir}>` from locale config in `src/app/[locale]/layout.tsx`
+- Every input has `<Label htmlFor>` from `src/components/ui/label.tsx`; errors use `aria-invalid` + `aria-describedby`
+- Focus visible: `focus-visible:ring-ring` with min 3px ring (see `src/styles/a11y.css`)
 - Min touch target 24×24px (WCAG 2.2 SC 2.5.8)
 - Use logical CSS only — see `i18n-rtl.mdc`
 
 ## Tooling
+
 - `eslint-plugin-jsx-a11y` in CI
 - `@storybook/addon-a11y` on all stories
 - `@axe-core/playwright` for E2E a11y scans
 
 ## Testing
-Run `pnpm test:a11y` and ensure Storybook stories pass axe with zero violations.
 
-**Supersedes:** `compliance.mdc` (deprecated — do not use)
+Run `pnpm test:a11y` and ensure Storybook stories pass axe with zero violations.

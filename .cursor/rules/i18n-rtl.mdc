@@ -1,6 +1,7 @@
 ---
 description: next-intl + logical CSS + RTL rules
-alwaysApply: true
+alwaysApply: false
+globs: src/**/*.ts, src/**/*.tsx, messages/**
 ---
 
 - All user-visible strings MUST use next-intl (no hardcoded text in TSX)

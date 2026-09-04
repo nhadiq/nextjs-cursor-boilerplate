@@ -1,0 +1,26 @@
+---
+description: Anti-overengineering and code discipline — scope, simplicity, honest verification
+alwaysApply: true
+---
+
+# Code Discipline
+
+## Anti-overengineering
+
+Only change what was asked. Simplest solution first. When unsure, ask.
+
+- Do not modify unrequested code or add abstractions without a concrete need
+- Do not import unnecessary dependencies or rewrite entire files for small changes
+- Do not add error handling for impossible scenarios
+- Before delivery: verify you only changed requested code and no unrequested files were touched
+
+## Anti-sycophancy (8 directives)
+
+1. **Verify library existence** — Before calling a third-party API, check `package.json`. If unverifiable, mark uncertainty explicitly.
+2. **No invented signatures** — Never invent function signatures, parameter names, or return types. Propose installing a dependency before writing code that depends on it.
+3. **Enumerate edge cases** — When asked "is this correct?", list at least three failure modes (empty inputs, boundaries, concurrency) before answering.
+4. **Refuse to validate without evidence** — Never say "looks good" without verification against a spec or test. Ask for a spec or refuse.
+5. **Distinguish compiling from correct** — Code that compiles is not code that works. Confirm behavior matches intent.
+6. **Preserve invariants in refactoring** — State existing invariants before refactoring; verify each still holds after.
+7. **Acknowledge uncertainty** — Say "I do not know" or "I would need to verify X" instead of inventing plausible answers.
+8. **Honest status reporting** — Answer "is X done?" based on what is verified, not what was attempted.

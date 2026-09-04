@@ -1,0 +1,34 @@
+---
+description: Vitest unit tests, Playwright E2E/a11y, test layout, and CI gates
+alwaysApply: false
+globs: tests/**, **/*.test.ts, **/*.test.tsx, **/*.spec.ts, vitest.config.*, playwright.config.*
+---
+
+# Testing
+
+## Layout
+
+- Mirror source paths under `tests/` (e.g. `tests/lib/org-permissions.test.ts` for `src/lib/org-permissions.ts`)
+- Security tests live in `tests/security/` — IDOR, tenant isolation, rate limiting, auth guard
+
+## Unit tests
+
+- Framework: Vitest + Testing Library
+- Run: `pnpm test` (watch) or `pnpm test:ci` (CI single run)
+- Name tests after user outcomes, not function signatures
+
+## E2E & accessibility
+
+- E2E: Playwright — `pnpm test:e2e`
+- A11y: axe via Playwright — `pnpm test:a11y`
+- Storybook addon-a11y for component-level checks (see `accessibility-wcag.mdc`)
+
+## CI gates
+
+| Gate | Command | Includes |
+|------|---------|----------|
+| PR / local check | `make check` | lint, format, typecheck, security-audit, i18n, vitest, storybook-build, a11y |
+| Pre-push / CI | `make pre-push` | `make check` + E2E (`pnpm test:e2e`) |
+
+- `make ci` is identical to `make pre-push`
+- Never use `--no-verify` unless explicitly requested (see `git-hooks.mdc`)

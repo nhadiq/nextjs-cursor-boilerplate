@@ -1,6 +1,6 @@
 ---
 description: Fix linting
-globs: 
+globs: **/*.ts, **/*.tsx, **/*.js, **/*.jsx, eslint.config.*
 alwaysApply: false
 ---
 Always fix lint by correcting on code, #Never use scripts or alternates and edit the lint code or the builds to work around the error

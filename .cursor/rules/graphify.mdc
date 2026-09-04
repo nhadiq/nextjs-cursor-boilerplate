@@ -50,7 +50,7 @@ Prefer `graphify query` over reading raw files or the full report.
 
 - **Auth**: `graphify explain "auth.ts"`, `graphify query "Better Auth sign in flow"`
 - **Database**: `graphify explain "db.ts"`, `graphify path "User" "Session"`
-- **Route protection**: `graphify explain "middleware.ts"`, `graphify explain "auth-guard.ts"`
+- **Route protection**: `graphify explain "proxy.ts"`, `graphify explain "auth-guard.ts"`
 - **API routes**: `graphify query "auth API route handler"`
 
 ## Subagent template

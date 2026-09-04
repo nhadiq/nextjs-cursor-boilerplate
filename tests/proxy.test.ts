@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
 import { runAuthGuard } from '@/lib/auth-guard';
 
-describe('middleware route protection', () => {
+describe('proxy route protection', () => {
   it('redirects unauthenticated users from locale-prefixed protected routes', () => {
     const request = new NextRequest('http://localhost:3000/en/dashboard');
     const response = runAuthGuard(request, '/en/dashboard', 'en', ['en', 'ar']);

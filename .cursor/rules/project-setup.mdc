@@ -1,5 +1,5 @@
 ---
-description: Project bootstrap — run pnpm setup on fresh clone
+description: Project bootstrap — run pnpm bootstrap on fresh clone
 alwaysApply: true
 ---
 
@@ -42,3 +42,7 @@ pnpm dev
 ## Do commit
 
 - `.cursor/rules/graphify.mdc` (query-first agent behavior)
+
+## Next.js devtools
+
+When working with Next.js, always call the init tool from next-devtools-mcp at the start of the session.

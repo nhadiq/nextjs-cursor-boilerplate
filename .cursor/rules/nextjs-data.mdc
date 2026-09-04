@@ -1,0 +1,59 @@
+---
+description: Server actions, services, validation, and data-layer error handling
+alwaysApply: false
+globs: src/actions/**, src/services/**, src/lib/safe-action.ts, src/types/actions.ts
+---
+
+# Next.js Data Layer
+
+## Server actions pattern
+
+Actions live in `src/actions/` (not only `src/app/`). Use `actionClient` from `src/lib/safe-action.ts`:
+
+```typescript
+'use server';
+import { actionClient } from '@/lib/safe-action';
+import { requireSession } from '@/lib/org-server';
+import { updateUserProfile } from '@/services/profile.service';
+
+export const updateProfileAction = actionClient
+  .schema(updateProfileSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await requireSession();
+    await updateUserProfile(session.user.id, { /* ... */ });
+    revalidatePath('/profile');
+    return { name: parsedInput.name };
+  });
+```
+
+## Auth in actions
+
+- Use `requireSession()` / `requireOrganization()` from `org-server.ts` inside actions
+- Call `requireOrgPermission()` before member/invitation/settings mutations
+- See `better-auth-multitenancy.mdc` for full auth/org file map
+
+## Services
+
+- Business logic in `src/services/` throws `ForbiddenError` / `NotFoundError` from `tenant-guard.ts`
+- Services throw user-friendly errors that TanStack Query can catch and display
+
+## Client integration
+
+- Use `useAction` from `next-safe-action/hooks` for form submissions (see `profile-form.tsx`)
+- TanStack Query: `QueryClientProvider` in `providers.tsx`; use `useQuery` when client caching is needed
+- `ActionResponse<T>` type in `src/types/actions.ts` for non-safe-action returns
+
+## Validation & error handling
+
+- Use next-safe-action for all server actions with Zod input schemas
+- Model expected errors as return values; avoid try/catch for expected errors in actions
+- Use `useActionState` with react-hook-form for form validation where appropriate
+- Use error boundaries for unexpected errors (`error.tsx`, `global-error.tsx`)
+- Prioritize error handling at function entry with guard clauses and early returns
+- Place the happy path last; avoid unnecessary `else` after early returns
+- Implement user-friendly error messages; use custom error types (`ForbiddenError`, `NotFoundError`) for consistency
+
+## Cross-reference
+
+> Input validation policy and secrets: `security.mdc`
+> Auth helpers in actions: `better-auth-multitenancy.mdc`

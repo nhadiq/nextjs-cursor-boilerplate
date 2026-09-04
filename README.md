@@ -12,7 +12,7 @@ A production-ready Next.js boilerplate with **Better Auth**, **multitenancy**, *
 | i18n              | next-intl with English + Arabic, RTL support                                                      |
 | Frontend          | Tailwind CSS 4, Shadcn UI, app shell with sidebar                                                 |
 | Email             | Resend for password reset and email verification                                                  |
-| Route protection  | `middleware.ts` — locale routing, auth guard, rate limiting                                       |
+| Route protection  | `proxy.ts` — locale routing, auth guard, rate limiting (Next.js 16)                               |
 | Quality           | Vitest, Playwright, Storybook, axe accessibility tests                                            |
 | Deploy            | Vercel (see [docs/deployment-vercel.md](docs/deployment-vercel.md))                               |
 | Code intelligence | [Graphify](https://github.com/Graphify-Labs/graphify) knowledge graph                             |
@@ -103,7 +103,7 @@ src/
 ├── hooks/                 # useAuth, useOrganization
 ├── lib/                   # auth, db, email, tenant-guard
 ├── services/              # Business logic layer
-└── middleware.ts          # Locale + auth + rate limit
+└── proxy.ts               # Locale + auth + rate limit (Next.js 16)
 prisma/
 ├── schema.prisma
 └── migrations/

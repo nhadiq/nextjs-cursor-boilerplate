@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 
 /**
- * Optimistic route protection for middleware.
+ * Optimistic route protection for proxy (Next.js 16).
  *
  * Uses `getSessionCookie()` for fast redirects — cookie presence only.
  * This is NOT authorization. Protected pages, RSC, and server actions

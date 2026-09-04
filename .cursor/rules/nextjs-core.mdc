@@ -1,0 +1,54 @@
+---
+description: Next.js App Router core — RSC, routing, metadata, images, env, TypeScript
+alwaysApply: false
+globs: src/**/*.ts, src/**/*.tsx
+---
+
+# Next.js Core
+
+Expert-level Next.js + TypeScript practices for this project.
+
+## App Router
+
+- Use server components by default; add `'use client'` only when necessary
+- File-based routing under `src/app/` with `[locale]` segment for i18n
+- Use `layout.tsx` for shared layouts, `loading.tsx` for loading states, `error.tsx` for error handling
+- `global-error.tsx` at `src/app/global-error.tsx` for root-level failures
+- Route handlers for API routes under `src/app/api/`
+- Follow Next.js naming conventions for special files
+
+## Async APIs (Next.js 15+)
+
+- `params`, `searchParams`, `cookies()`, and `headers()` are async — await them in server components and route handlers
+
+## TypeScript & code quality
+
+- Use TypeScript for type safety across all source files
+- Write clear, readable code; focus on readability over micro-optimization
+- Fully implement requested functionality — no TODOs or placeholders
+- Reference filenames when discussing changes
+- If uncertain, say so instead of guessing
+
+## SEO & metadata
+
+- Implement proper metadata for SEO via `metadata` export or `generateMetadata()`
+- Localize metadata per locale (see `i18n-rtl.mdc`)
+
+## Images
+
+- Use `next/image` for optimized images
+- Include size data; prefer WebP where appropriate; lazy-load non-critical images
+
+## Environment & configuration
+
+- All secrets and config via environment variables validated in `src/env.ts`
+- Never hardcode credentials or bypass `src/env.ts`
+
+## Error handling
+
+- Implement proper error boundaries (`error.tsx`, `global-error.tsx`)
+- Use error boundaries for unexpected errors; model expected errors as return values in actions (see `nextjs-data.mdc`)
+
+## Styling
+
+- Use Tailwind CSS for styling (component-level patterns in `nextjs-ui.mdc`)

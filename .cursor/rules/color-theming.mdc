@@ -1,6 +1,7 @@
 ---
 description: Semantic color token convention for Tailwind + shadcn
-alwaysApply: true
+alwaysApply: false
+globs: src/**/*.tsx, src/**/*.css
 ---
 
 ## Three-layer token system

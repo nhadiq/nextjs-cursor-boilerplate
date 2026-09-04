@@ -1,5 +1,7 @@
 ---
-alwaysApply: true
+description: Store docs in docs/ folder
+alwaysApply: false
+globs: docs/**, README.md
 ---
 
 Always store documentations and md files into docs folder not on the root of the project. If you want to reference file do the same as well.

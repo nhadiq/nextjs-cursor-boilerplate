@@ -1,6 +1,6 @@
 ---
 description: Package management
-globs: 
+globs: package.json, pnpm-lock.yaml, pnpm-workspace.yaml
 alwaysApply: false
 ---
 Never downgrade packages, always keep them uptodate using pnpm and work around code to fix issues and make them the latest.

@@ -1,6 +1,0 @@
----
-description: Deprecated — merged into accessibility-wcag.mdc
-alwaysApply: false
----
-
-This rule is deprecated. Use `.cursor/rules/accessibility-wcag.mdc` instead.

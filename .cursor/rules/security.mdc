@@ -1,12 +1,13 @@
 ---
 description: Security policies — auth, tenancy, input, secrets, headers
-alwaysApply: true
+alwaysApply: false
+globs: src/**/*, prisma/**
 ---
 
 ## Authentication & Sessions
 - Use Better Auth APIs only — never roll custom auth
 - Validate session server-side via auth.api.getSession() on protected server code
-- Middleware cookie check is optimistic only — pages/actions MUST re-validate
+- Proxy cookie check (`src/proxy.ts` / `auth-guard.ts`) is optimistic only — pages/actions MUST re-validate
 - Session cookies: httpOnly, secure in production, sameSite=lax
 - Password min 8 chars; consider increasing to 12 for production policy
 

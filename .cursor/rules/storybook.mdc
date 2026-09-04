@@ -1,6 +1,7 @@
 ---
 description: Mandatory Storybook stories for all components
-alwaysApply: true
+alwaysApply: false
+globs: src/components/**, src/**/*.stories.tsx, .storybook/**
 ---
 
 - Every component in `src/components/` MUST have a co-located `.stories.tsx`
