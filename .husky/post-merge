@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+set -eu
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Refresh Graphify graph after pull/merge (optional, non-blocking)
+if command -v graphify >/dev/null 2>&1; then
+  echo "→ post-merge: refreshing Graphify graph..."
+  pnpm graphify:update || true
+else
+  echo "→ post-merge: graphify CLI not found — skipping graph refresh"
+fi

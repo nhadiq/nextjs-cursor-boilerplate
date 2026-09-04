@@ -1,12 +1,11 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
----
 description: Rules for UI development and styling using Shadcn UI and Tailwind CSS, emphasizing responsive design and a mobile-first approach.
 globs: **/*.{ts,tsx,js,jsx}
+alwaysApply: true
 ---
 - Use Shadcn UI, and Tailwind for components and styling.
+- Follow semantic color tokens — see `color-theming.mdc`
 - Implement responsive design with Tailwind CSS
 - All shadcn components are available at src/components/ui folder
+- **Colors:** follow `color-theming.mdc` — semantic Tailwind tokens only, no raw hex/hsl/oklch in TSX
+- **Accessibility:** follow `accessibility-wcag.mdc` — WCAG 2.2 AA baseline on all UI

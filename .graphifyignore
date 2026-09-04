@@ -1,0 +1,16 @@
+# Build and dependency artifacts (beyond .gitignore)
+.next/
+out/
+node_modules/
+src/generated/
+
+# Graphify output — do not index the graph itself
+graphify-out/
+
+# Lockfiles and large generated assets
+pnpm-lock.yaml
+package-lock.json
+
+# Local databases
+prisma/dev.db
+prisma/dev.db-journal

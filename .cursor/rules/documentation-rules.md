@@ -1,5 +1,6 @@
 ---
 alwaysApply: true
 ---
+
 Always store documentations and md files into docs folder not on the root of the project. If you want to reference file do the same as well.
 Also version them properly and apend files if something already exist for similar task than creating new files each time

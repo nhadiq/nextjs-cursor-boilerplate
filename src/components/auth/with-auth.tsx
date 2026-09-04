@@ -1,44 +1,39 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/hooks/use-auth';
 
-// Higher-order component for protecting routes
 export function withAuth<P extends object>(
   Component: React.ComponentType<P>,
-  options: { redirectTo?: string } = {}
+  options: { redirectTo?: string } = {},
 ) {
   const { redirectTo = '/auth/signin' } = options;
-  
+
   return function ProtectedRoute(props: P) {
     const { user, loading } = useAuth();
     const router = useRouter();
-    
+    const t = useTranslations('common');
+
     useEffect(() => {
       if (!loading && !user) {
-        // Add redirect query parameter to preserve the original destination
-        const redirectUrl = new URL(redirectTo, window.location.origin);
-        redirectUrl.searchParams.set('redirect', window.location.pathname);
-        router.push(redirectUrl.pathname + redirectUrl.search);
+        router.push(
+          `${redirectTo}?redirect=${encodeURIComponent(window.location.pathname)}`,
+        );
       }
-    }, [router, loading, user]);
-    
-    // Show loading state
+    }, [loading, user, router]);
+
     if (loading) {
       return (
         <div className="flex h-screen items-center justify-center">
-          <div className="text-center">Loading...</div>
+          <div className="text-center">{t('loading')}</div>
         </div>
       );
     }
-    
-    // If not authenticated, don't render anything
-    if (!user) {
-      return null;
-    }
-    
-    // If authenticated, render the component
+
+    if (!user) return null;
+
     return <Component {...props} />;
   };
-} 
+}

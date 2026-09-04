@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -eu
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "→ pre-commit: lint-staged (staged files)"
+make pre-commit

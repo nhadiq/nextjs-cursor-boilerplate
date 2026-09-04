@@ -1,0 +1,60 @@
+---
+description: Graphify knowledge graph — mandatory query-first codebase exploration
+alwaysApply: true
+---
+
+# Graphify — Query Before You Read
+
+This project has a [Graphify](https://github.com/Graphify-Labs/graphify) knowledge graph at `graphify-out/graph.json`.
+
+**MANDATORY: Before using Read, Grep, Glob, or Bash to explore the codebase, run Graphify first:**
+
+```bash
+graphify query "<question>"   # scoped subgraph for architecture/behavior questions
+graphify path "<A>" "<B>"     # dependency path between two symbols
+graphify explain "<concept>"  # all nodes related to a concept
+```
+
+Or use project scripts:
+
+```bash
+pnpm graphify:update          # refresh graph after code changes (AST-only, no API cost)
+pnpm graphify:build           # full rebuild if graph.json is missing
+```
+
+This applies to **you and every subagent** you spawn. Include this rule explicitly in subagent prompts that involve code exploration. Do not skip Graphify because files are "already known" — the graph surfaces cross-file dependencies and INFERRED edges that grep and Read cannot find.
+
+## When to use Read/Grep/Glob directly
+
+1. Graphify already oriented you and you need exact lines to edit or debug
+2. `graphify-out/graph.json` does not exist — run `pnpm bootstrap` or `pnpm graphify:build` first
+3. You are editing a file you already have open with full context
+
+## After code changes
+
+- After modifying source: `pnpm graphify:update`
+- After `git pull` or merge: graph refreshes automatically via `.husky/post-merge` (or run `pnpm graphify:update` manually)
+- Graph outputs are gitignored — each developer regenerates locally via bootstrap and post-merge
+
+## Reference files
+
+| File | Use |
+|------|-----|
+| `graphify-out/GRAPH_REPORT.md` | Broad architecture review only when query/path/explain are insufficient |
+| `graphify-out/graph.html` | Interactive visualization (when generated via `pnpm graphify:viz`) |
+| `graphify-out/wiki/index.md` | Agent-crawlable wiki (when `--wiki` was used) |
+
+Prefer `graphify query` over reading raw files or the full report.
+
+## Project hotspots (Better Auth boilerplate)
+
+- **Auth**: `graphify explain "auth.ts"`, `graphify query "Better Auth sign in flow"`
+- **Database**: `graphify explain "db.ts"`, `graphify path "User" "Session"`
+- **Route protection**: `graphify explain "middleware.ts"`, `graphify explain "auth-guard.ts"`
+- **API routes**: `graphify query "auth API route handler"`
+
+## Subagent template
+
+When launching explore/review subagents:
+
+> Run `graphify query "<task-specific question>"` before reading source files. Run `pnpm graphify:update` if the graph may be stale.

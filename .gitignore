@@ -19,6 +19,7 @@
 
 # production
 /build
+/storybook-static
 
 # misc
 .DS_Store
@@ -30,12 +31,24 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — keep .env.example committed for onboarding
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+
+# prisma — generated client is rebuilt; local db stays local
+/prisma/dev.db
+/prisma/dev.db-journal
+/src/generated/
+
+# graphify — local-only; regenerated via bootstrap and .husky/post-merge
+/graphify-out/

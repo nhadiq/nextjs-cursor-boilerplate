@@ -1,0 +1,44 @@
+---
+description: Security policies — auth, tenancy, input, secrets, headers
+alwaysApply: true
+---
+
+## Authentication & Sessions
+- Use Better Auth APIs only — never roll custom auth
+- Validate session server-side via auth.api.getSession() on protected server code
+- Middleware cookie check is optimistic only — pages/actions MUST re-validate
+- Session cookies: httpOnly, secure in production, sameSite=lax
+- Password min 8 chars; consider increasing to 12 for production policy
+
+## Authorization & Multitenancy
+- Every org-scoped DB query MUST include organizationId from verified session — never from client input alone
+- Use requireOrgPermission() before member/invitation/settings mutations
+- Prevent IDOR: verify user is member of org before returning org data
+- RBAC checks on server — client UI hiding is not security
+
+## Input & Output
+- Validate all inputs with Zod schemas — server actions, API routes, forms
+- Use Prisma parameterized queries only — no raw SQL string concatenation
+- Sanitize user-generated content displayed as HTML (use plain text or DOMPurify if rich text added)
+- Error responses must not leak stack traces, SQL, or internal paths in production
+
+## Secrets & Configuration
+- Never commit .env, tokens, keys, or credentials
+- All secrets via environment variables; validate at startup with src/env.ts (Zod)
+- Never log session tokens, passwords, reset tokens, or API keys
+- Rotate BETTER_AUTH_SECRET on compromise; document in security-policy.md
+
+## HTTP & Browser Security
+- Security headers on all responses (see next.config.ts / vercel.json)
+- Content-Security-Policy configured; no unsafe-inline scripts in production without documented exception
+- CORS: trustedOrigins in Better Auth only — no wildcard origins
+- Rate limit auth endpoints (/api/auth/*)
+
+## Dependencies & CI
+- Run pnpm audit in make security-audit; block high/critical in CI
+- Dependabot enabled (already configured)
+- No new dependencies without security review
+
+## Logging & Monitoring
+- Log auth failures, permission denials, rate limit hits (no PII in logs)
+- Do not log email addresses at info level in production

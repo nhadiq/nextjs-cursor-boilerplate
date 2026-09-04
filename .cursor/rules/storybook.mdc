@@ -1,0 +1,13 @@
+---
+description: Mandatory Storybook stories for all components
+alwaysApply: true
+---
+
+- Every component in `src/components/` MUST have a co-located `.stories.tsx`
+- New components cannot be merged without a story covering all variants
+- Stories use semantic theme tokens only (see `color-theming.mdc`)
+- Stories must pass axe a11y checks (see `accessibility-wcag.mdc`)
+- Layout/navigation stories must include RTL variant
+- Use Storybook autodocs (`tags: ['autodocs']`)
+- Each story file includes: `Default`, `Dark`, `RTL`
+- Run `pnpm build-storybook` before opening PRs

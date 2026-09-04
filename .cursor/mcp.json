@@ -1,21 +1,21 @@
 {
-    "mcpServers": {
-      "Magic MCP": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@21st-dev/magic@latest",
-          "API_KEY=\"f3a7c25fa5a7514dd5949a27c3d0cd30e37e7e71657b1d2087f7b66e69766749\""
-        ],
-        "env": {}
-      },
-      "shadcn": {
-        "command": "npx",
-        "args": ["shadcn@latest", "mcp"]
-      },
-      "next-devtools": {
-        "command": "npx",
-        "args": ["-y", "next-devtools-mcp@latest"]
-      }
+  "mcpServers": {
+    "Magic MCP": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@21st-dev/magic@latest",
+        "API_KEY=\"f3a7c25fa5a7514dd5949a27c3d0cd30e37e7e71657b1d2087f7b66e69766749\""
+      ],
+      "env": {}
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
     }
   }
+}

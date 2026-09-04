@@ -1,179 +1,148 @@
-# 🚀 NextJS Cursor Boilerplate
+# Next.js Cursor Boilerplate
 
-A **Quick Build Boilerplate** for launching production-ready applications with **Next.js**, built using **Cursor** and powered by **Firebase or Supabase** for authentication.  
+A production-ready Next.js boilerplate with **Better Auth**, **multitenancy**, **Prisma**, **i18n (en/ar + RTL)**, **Tailwind CSS**, and **Shadcn UI**.
 
-It comes preloaded with essential tools and patterns to ship fast, including authentication, UI components with **TailwindCSS** + **Shadcn**, flexible backend, and integrations for payments, analytics, and notifications.
+## What's Included
 
-## 🧰 What's Included?
+| Feature           | Description                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| Auth              | [Better Auth](https://www.better-auth.com/) — email/password, verification, optional Google OAuth |
+| Multitenancy      | Better Auth organization plugin — personal org on signup, RBAC, org switcher                      |
+| Database          | Prisma 7 + SQLite (local dev), PostgreSQL for production                                          |
+| i18n              | next-intl with English + Arabic, RTL support                                                      |
+| Frontend          | Tailwind CSS 4, Shadcn UI, app shell with sidebar                                                 |
+| Email             | Resend for password reset and email verification                                                  |
+| Route protection  | `middleware.ts` — locale routing, auth guard, rate limiting                                       |
+| Quality           | Vitest, Playwright, Storybook, axe accessibility tests                                            |
+| Deploy            | Vercel (see [docs/deployment-vercel.md](docs/deployment-vercel.md))                               |
+| Code intelligence | [Graphify](https://github.com/Graphify-Labs/graphify) knowledge graph                             |
 
-| Feature         | Description                                           |
-|-----------------|-------------------------------------------------------|
-| 🔐 Auth         | Firebase or Supabase authentication (SignUp/Login/Logout) |
-| 🧠 Backend      | Extendable API structure using Next.js API routes     |
-| 🎨 Frontend     | TailwindCSS, Shadcn UI, fully responsive UI           |
-| 💾 Database     | Built-in support for Firestore/Supabase DB            |
-| 💸 Payments      | Placeholder for Stripe integration                    |
-| 🔔 Notifications | Hook-ready for email/push notification services       |
-| 📊 Analytics     | Ready to plug in tools like PostHog, Plausible, or GA |
-| 🔒 Security      | Route protection, environment config, and validation |
+## Getting Started
 
-## 🚀 Getting Started
+### 1. Install dependencies
 
-### 1. Clone the Repo
-
-\`\`\`bash
-git clone https://github.com/your-org/nextjs-cursor-boilerplate.git
-cd nextjs-cursor-boilerplate
-\`\`\`
-
-### 2. Install Dependencies
-
-\`\`\`bash
+```bash
 pnpm install
-\`\`\`
+pnpm bootstrap
+```
 
-> _Ensure you have pnpm installed. If not, install via \`npm i -g pnpm\`_
+`pnpm bootstrap` copies `.env.example` → `.env`, generates Prisma client, applies migrations, installs Husky hooks, and builds/updates the local Graphify graph when the CLI is available (`graphify-out/` is gitignored and refreshed on pull via post-merge hook).
 
-### 3. Setup Environment Variables
+### 2. Configure environment
 
-Create a \`.env.local\` file based on the template below:
+```bash
+cp .env.example .env
+```
 
-\`\`\`env
-# Firebase OR Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+Required variables:
 
-# Stripe (for payments)
-STRIPE_SECRET_KEY=
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+```env
+DATABASE_URL="file:./prisma/dev.db"
+BETTER_AUTH_SECRET=your-32-char-random-secret-here
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-# Email / Notification config
-SENDGRID_API_KEY=
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-\`\`\`
+Generate a secret:
 
-### 4. Start Development Server
+```bash
+openssl rand -base64 32
+```
 
-\`\`\`bash
+Optional — email (Resend):
+
+```env
+RESEND_API_KEY=re_...
+EMAIL_FROM=onboarding@resend.dev
+```
+
+### 3. Start the dev server
+
+```bash
 pnpm dev
-\`\`\`
+```
 
-## 🔐 Auth Options
+Open [http://localhost:3000](http://localhost:3000).
 
-Choose between **Firebase** or **Supabase** by switching the service in the \`/lib/auth.ts\` file.
+## Routes
 
-Example:
-\`\`\`ts
-import { createClient } from '@supabase/supabase-js'
-// OR
-import { initializeApp } from 'firebase/app'
-\`\`\`
+| Route                    | Description                                |
+| ------------------------ | ------------------------------------------ |
+| `/`                      | Landing page                               |
+| `/auth/signin`           | Sign in                                    |
+| `/auth/signup`           | Create account (auto-creates personal org) |
+| `/auth/reset-password`   | Password reset                             |
+| `/auth/verify-email`     | Email verification                         |
+| `/dashboard`             | Protected dashboard                        |
+| `/profile`               | Editable profile                           |
+| `/settings/organization` | Org settings                               |
+| `/settings/members`      | Member management                          |
+| `/settings/invitations`  | Pending invites                            |
+| `/org/new`               | Create additional org                      |
+| `/invite/[id]`           | Accept/reject invitation                   |
+| `/api/auth/*`            | Better Auth API                            |
 
-Already scaffolded:
+## Multitenancy
 
-- SignUp
-- Login
-- Logout
-- Route protection via higher-order component
+- Signup auto-creates a personal workspace (`databaseHooks` in `src/lib/auth.ts`)
+- Org switcher in app shell header
+- RBAC: `owner`, `admin`, `member` — enforced server-side via `src/lib/tenant-guard.ts`
+- Server helpers: `src/lib/org-server.ts`, `src/lib/org-permissions.ts`
 
-## 💅 UI/UX Stack
+## Project Structure
 
-- **TailwindCSS** for styling
-- **Shadcn/UI** for modern UI components
-- **Responsive layout** prebuilt with Headless UI patterns
+```
+src/
+├── app/[locale]/          # Localized routes
+├── actions/               # next-safe-action server actions
+├── components/
+│   ├── auth/              # withAuth, withOrg HOCs
+│   ├── layout/            # AppShell, sidebar, user nav
+│   ├── org/               # Org switcher, member management
+│   └── profile/           # Profile form
+├── hooks/                 # useAuth, useOrganization
+├── lib/                   # auth, db, email, tenant-guard
+├── services/              # Business logic layer
+└── middleware.ts          # Locale + auth + rate limit
+prisma/
+├── schema.prisma
+└── migrations/
+docs/
+├── deployment-vercel.md
+└── postgresql.md
+```
 
-## 🛠 Project Structure
+## Scripts
 
-\`\`\`
-/
-├── components/       → UI components
-├── pages/            → Next.js pages (API + frontend)
-├── lib/              → Auth, DB, helpers
-├── styles/           → TailwindCSS setup
-├── public/           → Static assets
-└── .env.local        → Environment variables
-\`\`\`
+| Command                | Description                     |
+| ---------------------- | ------------------------------- |
+| `pnpm dev`             | Start dev server                |
+| `pnpm build`           | Production build                |
+| `pnpm bootstrap`       | Fresh-clone setup               |
+| `pnpm db:migrate`      | Create/apply migrations         |
+| `pnpm db:push`         | Sync schema (dev fallback)      |
+| `pnpm graphify:update` | Refresh code intelligence graph |
 
-## 🔄 Updating the Boilerplate
+## Git Hooks
 
-As you evolve your project, here's how to scale this boilerplate:
+Pre-commit and pre-push hooks run via Husky + Makefile:
 
-### ✅ Add a New API Endpoint
+```bash
+make pre-commit   # lint-staged
+make pre-push     # lint, typecheck, tests, i18n, security-audit
+make ci           # same as pre-push
+```
 
-Create a file under \`/pages/api/\`:
+Post-merge refreshes the local Graphify graph after `git pull` (optional, non-blocking).
 
-\`\`\`ts
-// pages/api/example.ts
-export default function handler(req, res) {
-  res.status(200).json({ success: true })
-}
-\`\`\`
+## Switching to PostgreSQL
 
-### ✅ Add a New Page
+See [docs/postgresql.md](docs/postgresql.md) for the full adapter setup.
 
-\`\`\`bash
-touch pages/dashboard.tsx
-\`\`\`
+## Deploying to Vercel
 
-Inside:
+See [docs/deployment-vercel.md](docs/deployment-vercel.md) for environment variables and checklist.
 
-\`\`\`tsx
-export default function Dashboard() {
-  return <div className="p-4">Welcome to Dashboard</div>
-}
-\`\`\`
-
-### ✅ Add a New Component
-
-\`\`\`bash
-mkdir components/shared
-touch components/shared/Button.tsx
-\`\`\`
-
-\`\`\`tsx
-export default function Button({ children }) {
-  return <button className="bg-black text-white px-4 py-2 rounded">{children}</button>
-}
-\`\`\`
-
-### ✅ Change Auth Provider
-
-Update \`/lib/auth.ts\` and corresponding providers in \`_app.tsx\`.
-
-## 📦 Deployment
-
-Supports Vercel out of the box. For other platforms:
-
-\`\`\`bash
-pnpm build
-pnpm start
-\`\`\`
-
-## 🔗 Integrations Checklist
-
-| Feature      | Tool Suggestions                  |
-|--------------|-----------------------------------|
-| Auth         | Firebase Auth / Supabase Auth     |
-| DB           | Firestore / Supabase DB           |
-| Payments     | Stripe                            |
-| Analytics    | PostHog / Plausible / Google GA4  |
-| Notifications| SendGrid / OneSignal              |
-
-## 🧠 Contributing
-
-Pull requests are welcome. For major changes, open an issue first.
-
-## 📄 License
+## License
 
 [MIT](LICENSE)
-
-## 👨‍💻 Built With
-
-- [Next.js](https://nextjs.org/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [Shadcn/UI](https://ui.shadcn.com/)
-- [Firebase](https://firebase.google.com/) / [Supabase](https://supabase.io/)
-- [Stripe](https://stripe.com/)

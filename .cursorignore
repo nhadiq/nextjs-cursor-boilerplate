@@ -1,0 +1,13 @@
+# Keep graphify cache/local artifacts out of Cursor context (prompt cache + noise)
+graphify-out/cache/
+graphify-out/cost.json
+graphify-out/converted/
+graphify-out/.graphify_python
+graphify-out/.graphify_analysis.json
+graphify-out/.graphify_labels.json
+graphify-out/.graphify_labels.json.sig
+
+# Standard build/generated paths
+.next/
+node_modules/
+src/generated/

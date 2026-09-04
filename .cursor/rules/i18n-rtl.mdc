@@ -1,0 +1,13 @@
+---
+description: next-intl + logical CSS + RTL rules
+alwaysApply: true
+---
+
+- All user-visible strings MUST use next-intl (no hardcoded text in TSX)
+- New strings go in `messages/en.json` AND `messages/ar.json` (verified by `pnpm i18n:check`)
+- Use logical CSS properties only (`ms/me/ps/pe/start/end`) — never `ml/mr/pl/pr/left/right`
+- Set `lang` and `dir` on `<html>` from locale config
+- Icons with direction must flip in RTL (`rtl:rotate-180`)
+- Date/number formatting via next-intl formatters
+- SEO metadata must be localized per locale
+- Auth API routes stay at `/api/auth/*` (no locale prefix); redirects include locale (`/en/dashboard`)

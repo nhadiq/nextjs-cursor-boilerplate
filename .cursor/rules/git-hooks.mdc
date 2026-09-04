@@ -1,0 +1,12 @@
+---
+description: Git hooks and Makefile CI gate rules
+alwaysApply: true
+---
+
+- pre-commit → `make pre-commit` → `pnpm lint-staged`; failure blocks commit
+- pre-push → `make pre-push` → full check + E2E; failure blocks push (non-zero exit)
+- post-merge → `pnpm graphify:update` when Graphify CLI is installed (optional, non-blocking)
+- commit-msg → `pnpm commitlint`; failure blocks commit
+- `make ci` MUST equal `make pre-push` — keep in sync
+- Never use `--no-verify` unless user explicitly requests it
+- Add new quality checks to Makefile `check` target; they flow into `pre-push` and `ci`

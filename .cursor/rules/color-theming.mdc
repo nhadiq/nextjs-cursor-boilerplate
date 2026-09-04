@@ -1,0 +1,20 @@
+---
+description: Semantic color token convention for Tailwind + shadcn
+alwaysApply: true
+---
+
+## Three-layer token system
+
+1. **Semantic tokens** (`--{role}`) in `src/styles/theme-tokens.css` — never reference directly in TSX
+2. **Tailwind mappings** via `@theme inline` in `globals.css`
+3. **Components** use Tailwind utilities only: `bg-primary`, `text-muted-foreground`, `border-border`, `sidebar-*`
+
+## Forbidden in components
+- Raw hex/rgb/oklch/hsl values
+- `hsl(var(--*))` in className strings
+- Arbitrary colors like `bg-[#fff]` or `text-blue-500`
+
+## Adding new colors
+Add tokens to `theme-tokens.css` first, map in `globals.css` `@theme`, then use semantic Tailwind class.
+
+See also: `ui-and-styling-with-shadcn-ui-and-tailwind.mdc`

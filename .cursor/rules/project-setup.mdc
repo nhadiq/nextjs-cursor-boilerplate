@@ -1,0 +1,44 @@
+---
+description: Project bootstrap — run pnpm setup on fresh clone
+alwaysApply: true
+---
+
+# Project Setup
+
+On a **fresh clone**, run once:
+
+```bash
+pnpm install
+pnpm bootstrap
+```
+
+`pnpm bootstrap` will:
+
+1. Copy `.env.example` → `.env` if missing
+2. Generate Prisma client and push the SQLite schema
+3. Install Graphify git hooks (if `graphify` CLI is available)
+4. Build or update `graphify-out/graph.json` (always, when CLI is available)
+
+Then start development:
+
+```bash
+pnpm dev
+```
+
+## Prerequisites
+
+| Tool | Purpose | Install |
+|------|---------|---------|
+| Node.js 20+ | Runtime | [nodejs.org](https://nodejs.org) |
+| pnpm | Package manager | `npm i -g pnpm` |
+| Graphify CLI (optional) | Code intelligence graph | `uv tool install graphifyy` |
+
+## Do not commit
+
+- `.env` and other secrets (`.env.example` is committed)
+- `graphify-out/` (local-only; regenerated via bootstrap and post-merge hook)
+- `prisma/dev.db`, `src/generated/`, `.next/`
+
+## Do commit
+
+- `.cursor/rules/graphify.mdc` (query-first agent behavior)

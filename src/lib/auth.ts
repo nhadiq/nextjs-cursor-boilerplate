@@ -1,100 +1,116 @@
-import * as FirebaseAuth from './firebase';
-import * as SupabaseAuth from './supabase';
+import { betterAuth } from 'better-auth';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { nextCookies } from 'better-auth/next-js';
+import { organization } from 'better-auth/plugins';
+import { prisma } from '@/lib/db';
+import { env } from '@/env';
+import { sendPasswordResetEmail, sendVerificationEmail } from '@/lib/email';
+import { slugify } from '@/lib/utils';
 
-// Auth provider type
-export type AuthProvider = 'firebase' | 'supabase';
+const googleClientId = env.GOOGLE_CLIENT_ID;
+const googleClientSecret = env.GOOGLE_CLIENT_SECRET;
 
-// Default auth provider - can be set via an environment variable
-export const DEFAULT_AUTH_PROVIDER: AuthProvider = 
-  (process.env.NEXT_PUBLIC_AUTH_PROVIDER as AuthProvider) || 'firebase';
-
-/**
- * Auth service that provides a unified interface for both Firebase and Supabase
- */
-export class AuthService {
-  private provider: AuthProvider;
-
-  constructor(provider: AuthProvider = DEFAULT_AUTH_PROVIDER) {
-    this.provider = provider;
-  }
-
-  /**
-   * Set the authentication provider
-   */
-  setProvider(provider: AuthProvider) {
-    this.provider = provider;
-  }
-
-  /**
-   * Get the current authentication provider
-   */
-  getProvider(): AuthProvider {
-    return this.provider;
-  }
-
-  /**
-   * Sign up with email and password
-   */
-  async signUpWithEmailAndPassword(email: string, password: string) {
-    return this.provider === 'firebase'
-      ? FirebaseAuth.signUpWithEmailAndPassword(email, password)
-      : SupabaseAuth.signUpWithEmailAndPassword(email, password);
-  }
-
-  /**
-   * Sign in with email and password
-   */
-  async signInWithEmailAndPassword(email: string, password: string) {
-    return this.provider === 'firebase'
-      ? FirebaseAuth.signInWithEmailAndPassword(email, password)
-      : SupabaseAuth.signInWithEmailAndPassword(email, password);
-  }
-
-  /**
-   * Sign in with Google
-   */
-  async signInWithGoogle() {
-    return this.provider === 'firebase'
-      ? FirebaseAuth.signInWithGoogle()
-      : SupabaseAuth.signInWithGoogle();
-  }
-
-  /**
-   * Sign out the current user
-   */
-  async signOut() {
-    return this.provider === 'firebase'
-      ? FirebaseAuth.signOutUser()
-      : SupabaseAuth.signOutUser();
-  }
-
-  /**
-   * Send password reset email
-   */
-  async resetPassword(email: string) {
-    return this.provider === 'firebase'
-      ? FirebaseAuth.resetPassword(email)
-      : SupabaseAuth.resetPassword(email);
-  }
-
-  /**
-   * Get the current user
-   */
-  async getCurrentUser() {
-    return this.provider === 'firebase'
-      ? FirebaseAuth.getCurrentUser()
-      : SupabaseAuth.getCurrentUser();
-  }
-
-  /**
-   * Get the auth instance
-   */
-  getAuthInstance() {
-    return this.provider === 'firebase'
-      ? FirebaseAuth.getFirebaseAuth()
-      : SupabaseAuth.supabase.auth;
-  }
+function generateSlug(name: string): string {
+  const base = slugify(name);
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return `${base}-${suffix}`;
 }
 
-// Create and export a default auth service instance
-export const authService = new AuthService(); 
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: 'sqlite',
+  }),
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendPasswordResetEmail({
+        to: user.email,
+        resetUrl: url,
+        name: user.name,
+      });
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendVerificationEmail({
+        to: user.email,
+        verifyUrl: url,
+        name: user.name,
+      });
+    },
+  },
+  socialProviders:
+    googleClientId && googleClientSecret
+      ? {
+          google: {
+            clientId: googleClientId,
+            clientSecret: googleClientSecret,
+          },
+        }
+      : undefined,
+  session: {
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
+    cookieCache: { enabled: true, maxAge: 60 * 5 },
+  },
+  advanced: {
+    useSecureCookies: env.NODE_ENV === 'production',
+  },
+  trustedOrigins: [env.BETTER_AUTH_URL, env.NEXT_PUBLIC_APP_URL],
+  plugins: [
+    nextCookies(),
+    organization({
+      allowUserToCreateOrganization: true,
+      creatorRole: 'owner',
+      membershipLimit: 100,
+      invitationExpiresIn: 60 * 60 * 48,
+    }),
+  ],
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          const slug = generateSlug(user.name || user.email.split('@')[0]);
+          const org = await prisma.organization.create({
+            data: {
+              id: crypto.randomUUID(),
+              name: `${user.name}'s Workspace`,
+              slug,
+              createdAt: new Date(),
+              metadata: JSON.stringify({ personal: true }),
+            },
+          });
+
+          await prisma.member.create({
+            data: {
+              id: crypto.randomUUID(),
+              organizationId: org.id,
+              userId: user.id,
+              role: 'owner',
+              createdAt: new Date(),
+            },
+          });
+
+          const session = await prisma.session.findFirst({
+            where: { userId: user.id },
+            orderBy: { createdAt: 'desc' },
+          });
+
+          if (session) {
+            await prisma.session.update({
+              where: { id: session.id },
+              data: { activeOrganizationId: org.id },
+            });
+          }
+        },
+      },
+    },
+  },
+});
+
+export type Session = typeof auth.$Infer.Session;
